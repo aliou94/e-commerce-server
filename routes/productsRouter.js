@@ -1,46 +1,62 @@
 const express = require('express');
+const Products = require('../models/products');
 const productRouter = express.Router();
 
 productRouter.route('/')
-    .all((req, res, next) => {
+.get((req, res, next) => {
+    Products.find()
+    .then(product => {
         res.statusCode = 200;
-        res.setHeader('Content-Type', 'text/plain');
-        next();
+        res.setHeader('Content-Type', 'application/json');
+        res.json(product);
     })
-
-.get((req, res) => {
-    res.end('Will send all the products to you');
+    .catch(err => next(err));
 })
-
 
 
 
 productRouter.route('/electronics')
-.all((req, res, next) => {
-    res.statusCode = 200;
-    res.setHeader('Content-Type', 'text/plain');
-    next();
+.get((req, res, next) => {
+    Products.findById(req.params.electronics)
+    .then(campsite => {
+        res.statusCode = 200;
+        res.setHeader('Content-Type', 'application/json');
+        res.json(campsite);
+    })
+    .catch(err => next(err));
 })
-
-.get((req, res) => {
-    res.end('Will send all the electronic products to you');
+.post((req, res, next) => {
+    Products.create(req.body)
+    .then(prodcut => {
+        console.log('product Created ', prodcut);
+        res.statusCode = 200;
+        res.setHeader('Content-Type', 'application/json');
+        res.json(prodcut);
+    })
+    .catch(err => next(err));
 })
 
 
 
 productRouter.route('/books')
-.all((req, res, next) => {
-    res.statusCode = 200;
-    res.setHeader('Content-Type', 'text/plain');
-    next();
+.get((req, res, next) => {
+    Products.findById(req.params.books)
+    .then(product => {
+        res.statusCode = 200;
+        res.setHeader('Content-Type', 'application/json');
+        res.json(product);
+    })
+    .catch(err => next(err));
 })
-
-.get((req, res) => {
-    res.end('Will send all the book products to you');
+.post((req, res, next) => {
+    Products.create(req.body)
+    .then(prodcut => {
+        console.log('product Created ', prodcut);
+        res.statusCode = 200;
+        res.setHeader('Content-Type', 'application/json');
+        res.json(prodcut);
+    })
+    .catch(err => next(err));
 })
-
-
-
-
 
 module.exports = productRouter;
