@@ -1,25 +1,53 @@
 const express = require('express');
 const userRouter = express.Router();
+const Users = require('../models/user');
 
 userRouter.route('/')
-.get((req, res) => {
-    res.end('Will send all the users to you');
+.get((req, res, next) => {
+    Users.find()
+    .then(user => {
+        res.statusCode = 200;
+        res.setHeader('Content-Type', 'application/json');
+        res.json(user);
+    })
+    .catch(err => next(err));
+}).post((req, res, next) => {
+    Users.create(req.body)
+    .then(user => {
+        console.log('user Created ', user);
+        res.statusCode = 200;
+        res.setHeader('Content-Type', 'application/json');
+        res.json(user);
+    })
+    .catch(err => next(err));
 })
-
 
 userRouter.route('/:userId')
-.all((req, res, next) => {
-    res.statusCode = 200;
-    res.setHeader('Content-Type', 'text/plain');
-    next();
+.get((req, res, next) => {
+    Users.findById(req.params.userId)
+    .then(product => {
+        if (product) {
+            res.statusCode = 200;
+            res.setHeader('Content-Type', 'application/json');
+            res.json(product);
+        } else {
+            err = new Error(`Campsite ${req.params.userId} not found`);
+            err.status = 404;
+            return next(err);
+        }
+    })
+    .catch(err => next(err));
 })
-.get((req, res) => {
-    res.end('Will send a specific user to you');
-})
-
-.put((req, res) => {
-    res.statusCode = 403;
-    res.end('will update a specific user' );
+.put((req, res, next) => {
+    Users.findByIdAndUpdate(req.params.userId, {
+        $set: req.body
+    }, { new: true })
+    .then(campsite => {
+        res.statusCode = 200;
+        res.setHeader('Content-Type', 'application/json');
+        res.json(campsite);
+    })
+    .catch(err => next(err));
 })
 
 

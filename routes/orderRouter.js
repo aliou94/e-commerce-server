@@ -1,43 +1,59 @@
 const express = require('express');
 const orderRouter = express.Router();
+const Orders = require('../models/orders');
+const Users = require('../models/user');
 
 orderRouter.route('/')
-.get((req, res) => {
-    res.end('Will send all the orders to you');
+.get((req, res, next) => {
+    Orders.find()
+    .then(user => {
+        res.statusCode = 200;
+        res.setHeader('Content-Type', 'application/json');
+        res.json(user);
+    })
+    .catch(err => next(err));
+}).post((req, res, next) => {
+    Orders.create(req.body)
+    .then(user => {
+        console.log('user Created ', user);
+        res.statusCode = 200;
+        res.setHeader('Content-Type', 'application/json');
+        res.json(user);
+    })
+    .catch(err => next(err));
 })
-
-.post((req, res) => {
-    res.end(`Will add the purchase: ${req.body.name} with description: ${req.body.description}`);
-})
-
-
-.delete((req, res) => {
-    res.end('Deleting all purchase');
-});
 
 
 
 orderRouter.route('/:purchaseId')
-.all((req, res, next) => {
-    res.statusCode = 200;
-    res.setHeader('Content-Type', 'text/plain');
-    next();
+get((req, res, next) => {
+    Users.findById(req.params.purchaseId)
+    .then(campsite => {
+        res.statusCode = 200;
+        res.setHeader('Content-Type', 'application/json');
+        res.json(campsite);
+    })
+    .catch(err => next(err));
 })
-.get((req, res) => {
-    res.end('Will send a specific  purchase to you');
+.put((req, res, next) => {
+    Users.findByIdAndUpdate(req.params.purchaseId, {
+        $set: req.body
+    }, { new: true })
+    .then(campsite => {
+        res.statusCode = 200;
+        res.setHeader('Content-Type', 'application/json');
+        res.json(campsite);
+    })
+    .catch(err => next(err));
 })
-
-.post((req, res) => {
-    res.end(`Will add the purchase: ${req.body.name} with purchase: ${req.body.description}`);
-})
-
-.put((req, res) => {
-    res.statusCode = 403;
-    res.end('will update a specific purchase' );
-})
-
-.delete((req, res) => {
-    res.end('Deleting a specific  purchase');
+.delete((req, res, next) => {
+    Users.findByIdAndDelete(req.params.purchaseId)
+    .then(response => {
+        res.statusCode = 200;
+        res.setHeader('Content-Type', 'application/json');
+        res.json(response);
+    })
+    .catch(err => next(err));
 });
 
 
